@@ -5,18 +5,22 @@ import { stages as baseStages, StageData } from './Stages';
 import StageEditor from './StageEditor';
 
 interface StageManagerProps {
+  user: any; // User object from login
   inCourtroom?: boolean;
 }
 
-//this code was created with AI assistance
-
-const StageManager: React.FC<StageManagerProps> = ({ inCourtroom }) => {
+const StageManager: React.FC<StageManagerProps> = ({ user, inCourtroom }) => {
   const [stage, setStage] = useState(1);
   const [allStages, setAllStages] = useState<Record<number, StageData>>(baseStages);
   const [activeTasks, setActiveTasks] = useState<Task[]>([]);
   const [brokenCode, setBrokenCode] = useState<string>('');
   const [hints, setHints] = useState<string[]>([]);
   const [editing, setEditing] = useState(false);
+
+  // Load saved stages from user
+  useEffect(() => {
+    if (user?.stageProgress) setAllStages(user.stageProgress);
+  }, [user]);
 
   useEffect(() => {
     const stageData = allStages[stage];
@@ -69,6 +73,16 @@ const StageManager: React.FC<StageManagerProps> = ({ inCourtroom }) => {
     setStage(remainingStages[0] || 1);
   };
 
+  const saveStages = async () => {
+    if (!user) return;
+    await fetch('/api/saveStage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id, stageData: allStages }),
+    });
+    alert('Stages saved!');
+  };
+
   if (inCourtroom) return null;
 
   return (
@@ -80,6 +94,7 @@ const StageManager: React.FC<StageManagerProps> = ({ inCourtroom }) => {
         <button onClick={addNewStage} style={{ backgroundColor: 'green', color: 'white' }}>➕ Add New Stage</button>
         <button onClick={removeStage} style={{ backgroundColor: 'red', color: 'white' }}>🗑 Remove Stage</button>
         <button onClick={() => setEditing(!editing)} style={{ backgroundColor: '#555', color: 'white' }}>{editing ? 'Close Editor' : '✏️ Edit Stage'}</button>
+        <button onClick={saveStages} style={{ backgroundColor: 'blue', color: 'white' }}>💾 Save Stages</button>
       </div>
 
       {/* Task List & Code Editor */}
