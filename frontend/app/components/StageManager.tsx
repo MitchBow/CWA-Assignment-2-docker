@@ -109,7 +109,7 @@ const StageManager: React.FC<StageManagerProps> = ({ inCourtroom }) => {
           <textarea
             value={brokenCode}
             onChange={e => setBrokenCode(e.target.value)}
-            style={{ width: '100%', height: '250px', fontFamily: 'monospace', fontSize: '14px', borderRadius: '8px', padding: '10px' }}
+            style={{ width: '100%', height: '200px', fontFamily: 'monospace', fontSize: '14px', borderRadius: '8px', padding: '10px' }}
           />
           <div style={{ marginTop: '10px' }}>
             <button onClick={runCheck}>Run Check</button>
