@@ -1,7 +1,7 @@
 'use client'
   import { useEffect, useState } from 'react';
   
-  const APIURL = "http://ec2-18-212-206-85.compute-1.amazonaws.com.com:4080";//ec2 user goes here
+  const APIURL = "http://ec2-18-212-206-85.compute-1.amazonaws.com:4080";//ec2 user goes here
   
   export interface User {
     id: number;
