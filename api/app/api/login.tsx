@@ -1,20 +1,20 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { User } from '../lib/sequelize';
-import { initDB } from './_db';
+import { NextResponse } from 'next/server';
+import { User, initDB } from './_db';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await initDB();
-  if (req.method !== 'POST') return res.status(405).end();
+export async function POST(request: Request) {
+  try {
+    const { username, password } = await request.json();
 
-  const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
+    await initDB();
 
-  const user = await User.findOne({ where: { username, password } });
-  if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    const user = await User.findOne({ where: { username } });
+    if (!user || user.get('password') !== password) {
+      return NextResponse.json({ error: 'Invalid username or password' }, { status: 401 });
+    }
 
-  res.status(200).json({
-    id: user.id,
-    username: user.username,
-    stageProgress: user.stageProgress ? JSON.parse(user.stageProgress) : {},
-  });
+    return NextResponse.json({ success: true, userId: user.get('id') });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Login failed' }, { status: 500 });
+  }
 }

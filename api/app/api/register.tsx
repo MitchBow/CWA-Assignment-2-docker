@@ -1,17 +1,25 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { User } from '../lib/sequelize';
-import { initDB } from './_db';
+import { NextResponse } from 'next/server';
+import { User, initDB } from './_db';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await initDB();
-  if (req.method !== 'POST') return res.status(405).end();
+export async function POST(request: Request) {
+  try {
+    const { username, password } = await request.json();
 
-  const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
+    if (!username || !password) {
+      return NextResponse.json({ error: 'Missing username or password' }, { status: 400 });
+    }
 
-  const existingUser = await User.findOne({ where: { username } });
-  if (existingUser) return res.status(400).json({ error: 'Username already exists' });
+    await initDB();
 
-  const user = await User.create({ username, password, stageProgress: JSON.stringify({}) });
-  res.status(200).json({ id: user.id, username: user.username, stageProgress: {} });
+    const existingUser = await User.findOne({ where: { username } });
+    if (existingUser) {
+      return NextResponse.json({ error: 'User already exists' }, { status: 400 });
+    }
+
+    const newUser = await User.create({ username, password });
+    return NextResponse.json({ success: true, user: newUser });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Registration failed' }, { status: 500 });
+  }
 }

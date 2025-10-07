@@ -1,25 +1,19 @@
 'use client';
-import React, { useState } from 'react';
+import React from 'react';
 import Header from '../components/Header';
 import ManualTimer from '../components/ManualTimer';
-import CourtroomBackground from '../components/CourtroomBackground';
 import StageManager from '../components/StageManager';
-import NotificationManager from '../components/NotificationManager';
-import Courtroom from '../components/Courtroom';
 
-export default function Home() {
-  const [isCourtroom, setIsCourtroom] = useState(false);
-
+export default function CourtroomPage() {
   return (
-    <CourtroomBackground
-      courtroomSrc="/images/courtroom.jpg"
-      deskSrc="/images/desk.jpg"
-      isCourtroom={isCourtroom}
-    >
+    <div style={{ minHeight: '100vh', backgroundColor: '#f8f8f8' }}>
       <Header />
-      <ManualTimer/>
-      <StageManager />
-      <NotificationManager onCourtroom={setIsCourtroom} />
-    </CourtroomBackground>
+
+
+      {/* StageManager full width */}
+      <div style={{ width: '100%', padding: '0 20px', boxSizing: 'border-box' }}>
+        <StageManager />
+      </div>
+    </div>
   );
 }

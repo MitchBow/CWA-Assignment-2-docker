@@ -3,29 +3,26 @@ import React, { useState, useEffect } from 'react';
 import { Task } from './tasks';
 import { stages as baseStages, StageData } from './Stages';
 import StageEditor from './StageEditor';
+import ManualTimer from './ManualTimer';
 
 interface StageManagerProps {
-  user: any; // User object from login
   inCourtroom?: boolean;
 }
 
-const StageManager: React.FC<StageManagerProps> = ({ user, inCourtroom }) => {
+const StageManager: React.FC<StageManagerProps> = ({ inCourtroom }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [stage, setStage] = useState(1);
   const [allStages, setAllStages] = useState<Record<number, StageData>>(baseStages);
   const [activeTasks, setActiveTasks] = useState<Task[]>([]);
   const [brokenCode, setBrokenCode] = useState<string>('');
   const [hints, setHints] = useState<string[]>([]);
   const [editing, setEditing] = useState(false);
-
-  // Load saved stages from user
-  useEffect(() => {
-    if (user?.stageProgress) setAllStages(user.stageProgress);
-  }, [user]);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const stageData = allStages[stage];
     if (!stageData) return;
-
     setActiveTasks(stageData.tasks.map((t, i) => ({ id: `${stage}-${i}`, stage, message: t, completed: false })));
     setBrokenCode(stageData.code);
     setHints([]);
@@ -34,7 +31,6 @@ const StageManager: React.FC<StageManagerProps> = ({ user, inCourtroom }) => {
   const runCheck = () => {
     const stageData = allStages[stage];
     if (!stageData) return;
-
     setActiveTasks(prev =>
       prev.map(task => {
         const checkFn = stageData.checks[task.message];
@@ -73,20 +69,80 @@ const StageManager: React.FC<StageManagerProps> = ({ user, inCourtroom }) => {
     setStage(remainingStages[0] || 1);
   };
 
+  const loginRegister = async () => {
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) throw new Error('Login/Register failed');
+      setMessage('✅ Login/Register successful!');
+    } catch (err) {
+      setMessage('❌ Login/Register failed');
+    }
+  };
+
   const saveStages = async () => {
-    if (!user) return;
-    await fetch('/api/saveStage', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user.id, stageData: allStages }),
-    });
-    alert('Stages saved!');
+    try {
+      const res = await fetch('/api/stages/saveStage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, stages: allStages }),
+      });
+      if (!res.ok) throw new Error('Save failed');
+      setMessage('✅ Stages saved!');
+    } catch (err) {
+      setMessage('❌ Save failed');
+    }
+  };
+
+  const loadStages = async () => {
+    try {
+      const res = await fetch(`/api/stages/loadStage?username=${encodeURIComponent(username)}`);
+      if (!res.ok) throw new Error('Load failed');
+      const data = await res.json();
+      setAllStages(data.stages);
+      setMessage('✅ Stages loaded!');
+    } catch (err) {
+      setMessage('❌ Load failed');
+    }
   };
 
   if (inCourtroom) return null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '90%', margin: '30px auto', gap: '20px' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f8f8f8', paddingTop: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+      {/* Login/Register Card */}
+      <div style={{ width: '90%', maxWidth: '600px', backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+        <h2 style={{ marginBottom: '10px' }}>Login / Register</h2>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+        />
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+          <button onClick={loginRegister} style={{ flex: 1, padding: '8px', borderRadius: '6px', backgroundColor: '#0070f3', color: 'white', border: 'none', cursor: 'pointer' }}>Login / Register</button>
+          <button onClick={saveStages} style={{ flex: 1, padding: '8px', borderRadius: '6px', backgroundColor: 'green', color: 'white', border: 'none', cursor: 'pointer' }}>Save Stages</button>
+          <button onClick={loadStages} style={{ flex: 1, padding: '8px', borderRadius: '6px', backgroundColor: '#f39c12', color: 'white', border: 'none', cursor: 'pointer' }}>Load Stages</button>
+        </div>
+        {message && (
+          <div style={{ color: message.startsWith('✅') ? 'green' : 'red', fontWeight: 'bold' }}>{message}</div>
+        )}
+      </div>
+
+      {/* Timer */}
+      <ManualTimer />
+
       {/* Stage Controls */}
       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button onClick={() => setStage(stage - 1)} disabled={stage <= Math.min(...Object.keys(allStages).map(Number))}>Previous Stage</button>
@@ -94,13 +150,12 @@ const StageManager: React.FC<StageManagerProps> = ({ user, inCourtroom }) => {
         <button onClick={addNewStage} style={{ backgroundColor: 'green', color: 'white' }}>➕ Add New Stage</button>
         <button onClick={removeStage} style={{ backgroundColor: 'red', color: 'white' }}>🗑 Remove Stage</button>
         <button onClick={() => setEditing(!editing)} style={{ backgroundColor: '#555', color: 'white' }}>{editing ? 'Close Editor' : '✏️ Edit Stage'}</button>
-        <button onClick={saveStages} style={{ backgroundColor: 'blue', color: 'white' }}>💾 Save Stages</button>
       </div>
 
       {/* Task List & Code Editor */}
-      <div style={{ display: 'flex', gap: '20px' }}>
+      <div style={{ display: 'flex', gap: '20px', width: '90%' }}>
         {/* Left Side: Tasks */}
-        <div style={{ flex: 1, padding: '20px', borderRadius: '12px', backgroundColor: 'var(--header-footer-background)' }}>
+        <div style={{ flex: 1, padding: '20px', borderRadius: '12px', backgroundColor: 'white', color: '#333' }}>
           <h2>Stage {stage}</h2>
           <ul>
             {activeTasks.map(task => (
@@ -124,7 +179,7 @@ const StageManager: React.FC<StageManagerProps> = ({ user, inCourtroom }) => {
           <textarea
             value={brokenCode}
             onChange={e => setBrokenCode(e.target.value)}
-            style={{ width: '100%', height: '200px', fontFamily: 'monospace', fontSize: '14px', borderRadius: '8px', padding: '10px' }}
+            style={{ width: '100%', height: '200px', fontFamily: 'monospace', fontSize: '14px', borderRadius: '8px', padding: '10px', color: 'white', backgroundColor: '#1e1e1e' }}
           />
           <div style={{ marginTop: '10px' }}>
             <button onClick={runCheck}>Run Check</button>

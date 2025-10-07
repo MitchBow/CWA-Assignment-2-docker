@@ -1,17 +1,30 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { User } from '../lib/sequelize';
-import { initDB } from './_db';
+import { NextResponse } from 'next/server';
+import { Stage, initDB } from './_db';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(request: Request) {
+  try {
+    const { userId, stageData } = await request.json();
+
+    if (!userId || !stageData) {
+      return NextResponse.json({ error: 'Missing data' }, { status: 400 });
+    }
+
+    await initDB();
+
+    const newStage = await Stage.create({ userId, stageData });
+    return NextResponse.json({ success: true, stage: newStage });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Failed to save stage' }, { status: 500 });
+  }
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get('userId');
+
   await initDB();
-  if (req.method !== 'POST') return res.status(405).end();
+  const stages = await Stage.findAll({ where: { userId } });
 
-  const { userId, stageData } = req.body;
-  const user = await User.findByPk(userId);
-  if (!user) return res.status(404).json({ error: 'User not found' });
-
-  user.stageProgress = JSON.stringify(stageData);
-  await user.save();
-
-  res.status(200).json({ message: 'Stage saved!' });
+  return NextResponse.json(stages);
 }

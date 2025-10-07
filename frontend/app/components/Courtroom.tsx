@@ -1,27 +1,87 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 
-interface CourtroomProps {
-  visible: boolean;
-  reason: string;
-  onRetry?: () => void; 
-}
+export default function CourtroomPage() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [userId, setUserId] = useState<number | null>(null);
+  const [stages, setStages] = useState<any[]>([]);
 
-const Courtroom: React.FC<CourtroomProps> = ({ visible, reason, onRetry }) => {
-  if (!visible) return null;
+  const register = async () => {
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await res.json();
+    alert(data.error || 'Registered!');
+  };
+
+  const login = async () => {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setUserId(data.userId);
+      alert('Logged in!');
+    } else {
+      alert(data.error);
+    }
+  };
+
+  const saveStage = async () => {
+    if (!userId) return alert('Login first!');
+    const stageData = { message: 'Example stage data' }; // Replace with real stage state
+    const res = await fetch('/api/saveStage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, stageData }),
+    });
+    const data = await res.json();
+    alert(data.error || 'Stage saved!');
+  };
+
+  const loadStages = async () => {
+    if (!userId) return alert('Login first!');
+    const res = await fetch(`/api/saveStage?userId=${userId}`);
+    const data = await res.json();
+    setStages(data);
+  };
 
   return (
-    <>
-      <div style={{ position: 'fixed', top:0, left:0, width:'100vw', height:'100vh', backgroundColor:'rgba(0,0,0,0.7)', zIndex:1000, pointerEvents:'none' }} />
-      <div style={{ position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)', backgroundColor:'var(--header-footer-background)', padding:'30px', borderRadius:'10px', maxWidth:'500px', textAlign:'center', zIndex:1100, pointerEvents:'auto', color:'var(--text-color)' }}>
-        <h2>YOU GOT SENT TO COURT</h2>
-        <p>{reason}</p>
-        <div style={{ marginTop:'20px' }}>
-          {onRetry && <button onClick={onRetry} style={{ padding:'8px 16px', borderRadius:'6px', cursor:'pointer', backgroundColor:'var(--button-background)', color:'var(--button-text)', border:'none' }}>Retry</button>}
-        </div>
-      </div>
-    </>
-  );
-};
+    <div style={{ padding: '20px' }}>
+      <h2>Courtroom</h2>
 
-export default Courtroom;
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+        <input
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button onClick={register}>Register</button>
+        <button onClick={login}>Login</button>
+      </div>
+
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+        <button onClick={saveStage} disabled={!userId}>💾 Save Stage</button>
+        <button onClick={loadStages} disabled={!userId}>📂 Load Stages</button>
+      </div>
+
+      {stages.length > 0 && (
+        <div>
+          <h3>Loaded Stages:</h3>
+          <pre>{JSON.stringify(stages, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+  );
+}

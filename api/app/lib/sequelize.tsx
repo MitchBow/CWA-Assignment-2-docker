@@ -1,4 +1,3 @@
-// sequelize.tsx
 import { Sequelize, DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import path from 'path';
 import sqlite3 from 'sqlite3';
@@ -27,6 +26,6 @@ User.init(
   {
     sequelize,
     modelName: 'User',
-    timestamps: false, // disables createdAt/updatedAt
+    timestamps: false,
   }
 );
