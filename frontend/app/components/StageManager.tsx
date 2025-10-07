@@ -3,22 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { Task } from './tasks';
 import { stages as baseStages, StageData } from './Stages';
 import StageEditor from './StageEditor';
-import ManualTimer from './ManualTimer';
 
 interface StageManagerProps {
   inCourtroom?: boolean;
+  username?: string;
 }
 
-const StageManager: React.FC<StageManagerProps> = ({ inCourtroom }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+const StageManager: React.FC<StageManagerProps> = ({ inCourtroom, username }) => {
   const [stage, setStage] = useState(1);
   const [allStages, setAllStages] = useState<Record<number, StageData>>(baseStages);
   const [activeTasks, setActiveTasks] = useState<Task[]>([]);
   const [brokenCode, setBrokenCode] = useState<string>('');
   const [hints, setHints] = useState<string[]>([]);
   const [editing, setEditing] = useState(false);
-  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const stageData = allStages[stage];
@@ -64,85 +61,14 @@ const StageManager: React.FC<StageManagerProps> = ({ inCourtroom }) => {
     const updatedStages = { ...allStages };
     delete updatedStages[stage];
     setAllStages(updatedStages);
-
     const remainingStages = Object.keys(updatedStages).map(Number).sort((a, b) => a - b);
     setStage(remainingStages[0] || 1);
-  };
-
-  const loginRegister = async () => {
-    try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      if (!res.ok) throw new Error('Login/Register failed');
-      setMessage('✅ Login/Register successful!');
-    } catch (err) {
-      setMessage('❌ Login/Register failed');
-    }
-  };
-
-  const saveStages = async () => {
-    try {
-      const res = await fetch('/api/stages/saveStage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, stages: allStages }),
-      });
-      if (!res.ok) throw new Error('Save failed');
-      setMessage('✅ Stages saved!');
-    } catch (err) {
-      setMessage('❌ Save failed');
-    }
-  };
-
-  const loadStages = async () => {
-    try {
-      const res = await fetch(`/api/stages/loadStage?username=${encodeURIComponent(username)}`);
-      if (!res.ok) throw new Error('Load failed');
-      const data = await res.json();
-      setAllStages(data.stages);
-      setMessage('✅ Stages loaded!');
-    } catch (err) {
-      setMessage('❌ Load failed');
-    }
   };
 
   if (inCourtroom) return null;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f8f8', paddingTop: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-      {/* Login/Register Card */}
-      <div style={{ width: '90%', maxWidth: '600px', backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-        <h2 style={{ marginBottom: '10px' }}>Login / Register</h2>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
-        />
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-          <button onClick={loginRegister} style={{ flex: 1, padding: '8px', borderRadius: '6px', backgroundColor: '#0070f3', color: 'white', border: 'none', cursor: 'pointer' }}>Login / Register</button>
-          <button onClick={saveStages} style={{ flex: 1, padding: '8px', borderRadius: '6px', backgroundColor: 'green', color: 'white', border: 'none', cursor: 'pointer' }}>Save Stages</button>
-          <button onClick={loadStages} style={{ flex: 1, padding: '8px', borderRadius: '6px', backgroundColor: '#f39c12', color: 'white', border: 'none', cursor: 'pointer' }}>Load Stages</button>
-        </div>
-        {message && (
-          <div style={{ color: message.startsWith('✅') ? 'green' : 'red', fontWeight: 'bold' }}>{message}</div>
-        )}
-      </div>
-
-      {/* Timer */}
-      <ManualTimer />
-
+    <div style={{ minHeight: '100vh', paddingTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
       {/* Stage Controls */}
       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button onClick={() => setStage(stage - 1)} disabled={stage <= Math.min(...Object.keys(allStages).map(Number))}>Previous Stage</button>
@@ -153,7 +79,7 @@ const StageManager: React.FC<StageManagerProps> = ({ inCourtroom }) => {
       </div>
 
       {/* Task List & Code Editor */}
-      <div style={{ display: 'flex', gap: '20px', width: '90%' }}>
+      <div style={{ display: 'flex', gap: '20px', width: '100%' }}>
         {/* Left Side: Tasks */}
         <div style={{ flex: 1, padding: '20px', borderRadius: '12px', backgroundColor: 'white', color: '#333' }}>
           <h2>Stage {stage}</h2>
