@@ -4,7 +4,7 @@ import React from 'react';
 interface CourtroomBackgroundProps {
   courtroomSrc: string;
   deskSrc: string;
-  isCourtroom?: boolean; // optional prop to switch background
+  isCourtroom?: boolean;
   children: React.ReactNode;
 }
 
@@ -14,12 +14,15 @@ const CourtroomBackground: React.FC<CourtroomBackgroundProps> = ({ courtroomSrc,
   return (
     <div
       style={{
-        width: '95vw',
-        height: '80vh',
+        width: '100%',
+        minHeight: '600px',             // fixed minimum height
+        maxHeight: '800px',             // optional max height
         backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
+        backgroundSize: 'contain',      // <-- keep aspect ratio, no stretch
         backgroundPosition: 'center',
-        transition: 'background-image 0.5s ease-in-out',
+        backgroundRepeat: 'no-repeat',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       {children}
