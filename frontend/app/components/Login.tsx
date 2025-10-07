@@ -13,18 +13,33 @@ const Login: React.FC<LoginProps> = ({ saveStages, loadStages }) => {
   const [message, setMessage] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const loginRegister = async () => {
+  const handleLogin = async () => {
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
-      if (!res.ok) throw new Error('Login/Register failed');
-      setMessage('✅ Login/Register successful!');
+      if (!res.ok) throw new Error('Login failed');
+      setMessage('✅ Login successful!');
       setLoggedIn(true);
     } catch {
-      setMessage('❌ Login/Register failed');
+      setMessage('❌ Login failed');
+    }
+  };
+
+  const handleRegister = async () => {
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) throw new Error('Registration failed');
+      setMessage('✅ Registration successful!');
+      setLoggedIn(true);
+    } catch {
+      setMessage('❌ Registration failed');
     }
   };
 
@@ -47,7 +62,20 @@ const Login: React.FC<LoginProps> = ({ saveStages, loadStages }) => {
             onChange={e => setPassword(e.target.value)}
             style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
           />
-          <button onClick={loginRegister} style={{ width: '100%', padding: '8px', borderRadius: '6px', backgroundColor: '#0070f3', color: 'white', border: 'none', cursor: 'pointer' }}>Login / Register</button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              onClick={handleLogin}
+              style={{ flex: 1, padding: '8px', borderRadius: '6px', backgroundColor: '#0070f3', color: 'white', border: 'none', cursor: 'pointer' }}
+            >
+              Login
+            </button>
+            <button
+              onClick={handleRegister}
+              style={{ flex: 1, padding: '8px', borderRadius: '6px', backgroundColor: 'green', color: 'white', border: 'none', cursor: 'pointer' }}
+            >
+              Register
+            </button>
+          </div>
           {message && <div style={{ color: message.startsWith('✅') ? 'green' : 'red', fontWeight: 'bold', marginTop: '10px' }}>{message}</div>}
         </div>
       )}

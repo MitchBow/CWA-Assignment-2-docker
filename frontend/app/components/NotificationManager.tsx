@@ -14,12 +14,15 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({ onCourtroom }
   const [courtReason, setCourtReason] = useState('');
 
   // Load notifications on mount
-  useEffect(() => setQueue([...allNotifications]), []);
+  useEffect(() => {
+    setQueue([...allNotifications]);
+  }, []);
 
   // Show next notification
   useEffect(() => {
     if (activeNotification || inCourtroom || queue.length === 0) return;
 
+    // Schedule next notification
     const timer = setTimeout(() => {
       const next = queue[0];
       setActiveNotification(next);
@@ -36,11 +39,12 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({ onCourtroom }
         }
       }, next.escalationDelay);
 
+      // Cleanup escalation if notification acknowledged early
       return () => clearTimeout(escalation);
     }, 20000 + Math.random() * 10000);
 
     return () => clearTimeout(timer);
-  }, [activeNotification, queue, inCourtroom, onCourtroom]);
+  }, [activeNotification, queue, inCourtroom]); // Removed onCourtroom from dependencies
 
   const acknowledgeNotification = () => setActiveNotification(null);
 
@@ -53,36 +57,37 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({ onCourtroom }
   return (
     <>
       {activeNotification && !inCourtroom && (
-        <div style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          maxWidth: '300px',
-          backgroundColor: 'var(--header-footer-background)',
-          border: '1px solid var(--border-color)',
-          padding: '10px',
-          borderRadius: '8px',
-          zIndex: 1000,
-          color: 'var(--text-color)'
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            maxWidth: '300px',
+            backgroundColor: 'var(--header-footer-background)',
+            border: '1px solid var(--border-color)',
+            padding: '10px',
+            borderRadius: '8px',
+            zIndex: 1000,
+            color: 'var(--text-color)',
+          }}
+        >
           <strong>{activeNotification.sender}:</strong> {activeNotification.message}
-          <button onClick={acknowledgeNotification} style={{
-            marginLeft: '10px',
-            cursor: 'pointer',
-            borderRadius: '5px',
-            backgroundColor: 'var(--button-background)',
-            color: 'var(--button-text)'
-          }}>
+          <button
+            onClick={acknowledgeNotification}
+            style={{
+              marginLeft: '10px',
+              cursor: 'pointer',
+              borderRadius: '5px',
+              backgroundColor: 'var(--button-background)',
+              color: 'var(--button-text)',
+            }}
+          >
             Acknowledge
           </button>
         </div>
       )}
 
-      <Courtroom
-        visible={inCourtroom} // error here at visible
-        reason={courtReason}
-        onRetry={handleRetry}
-      />
+      <Courtroom visible={inCourtroom} reason={courtReason} onRetry={handleRetry} />
     </>
   );
 };
