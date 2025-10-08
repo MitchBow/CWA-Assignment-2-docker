@@ -17,12 +17,13 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.19",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/sequelize": "^4.28.20",
     "sequelize-cli": "^6.6.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

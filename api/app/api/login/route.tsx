@@ -1,3 +1,4 @@
+// app/api/login/route.ts
 import { NextResponse } from 'next/server';
 import { User } from '../../lib/sequelize';
 
@@ -16,5 +17,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Incorrect password' }, { status: 403 });
   }
 
-  return NextResponse.json({ user });
+  return NextResponse.json({ message: 'Login successful', user });
 }

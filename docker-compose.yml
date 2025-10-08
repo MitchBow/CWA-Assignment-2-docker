@@ -1,35 +1,46 @@
 services:
-     frontend:
-       build: ./frontend
-       ports:
-         - "80:3000"
-       depends_on:
-         - api
-       environment:
-         - NODE_ENV=development
-       volumes:
-         - ./frontend:/app
-       command: npm run dev
-   
-     api:
-       build: ./api
-       ports:
-         - "4080:3000"  # Next.js default port for API app
-       depends_on:
-         - sqlite
-       environment:
-         - NODE_ENV=development
-       volumes:
-         - ./api:/app
-         - sqlite_data:/app/sqlite
-       command: sh -c "npx sequelize-cli db:migrate && npm run dev"
-   
-     sqlite:
-       image: alpine
-       container_name: sqlite-volume-holder
-       volumes:
-         - sqlite_data:/sqlite
-       command: ["sh", "-c", "while true; do sleep 1000; done"]
-   
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:3000"                # Expose frontend on host port 80
+    depends_on:
+      - api
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://api:3000  # Docker internal API
+    volumes:
+      - ./frontend:/app
+    networks:
+      - app-network
+    command: npm run dev
+
+  api:
+    build: ./api
+    ports:
+      - "4080:3000"             # Optional: expose API to host for testing
+    depends_on:
+      - sqlite
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./api:/app
+      - sqlite_data:/app/sqlite
+    networks:
+      - app-network
+    command: sh -c "npx sequelize-cli db:migrate && npm run dev"
+
+  sqlite:
+    image: alpine
+    container_name: sqlite-volume-holder
+    volumes:
+      - sqlite_data:/sqlite
+    command: ["sh", "-c", "while true; do sleep 1000; done"]
+    networks:
+      - app-network
+
 volumes:
   sqlite_data:
+
+networks:
+  app-network:
+    driver: bridge

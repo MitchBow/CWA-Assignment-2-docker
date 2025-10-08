@@ -13,33 +13,50 @@ const Login: React.FC<LoginProps> = ({ saveStages, loadStages }) => {
   const [message, setMessage] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
 
+  // Use Docker Compose internal API URL
+  // Inside Docker, frontend can use the API container name
+  const API_URL = 'http://ec2-54-84-215-149.compute-1.amazonaws.com:4080/api/register';
+;
+
   const handleLogin = async () => {
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
-      if (!res.ok) throw new Error('Login failed');
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Login failed (${res.status}): ${text}`);
+      }
+      const data = await res.json();
+      console.log('✅ Login response:', data);
       setMessage('✅ Login successful!');
       setLoggedIn(true);
-    } catch {
-      setMessage('❌ Login failed');
+    } catch (err: any) {
+      console.error('❌ Login failed:', err);
+      setMessage(`❌ Login failed: ${err.message}`);
     }
   };
 
   const handleRegister = async () => {
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
-      if (!res.ok) throw new Error('Registration failed');
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Registration failed (${res.status}): ${text}`);
+      }
+      const data = await res.json();
+      console.log('✅ Register response:', data);
       setMessage('✅ Registration successful!');
       setLoggedIn(true);
-    } catch {
-      setMessage('❌ Registration failed');
+    } catch (err: any) {
+      console.error('❌ Registration failed:', err);
+      setMessage(`❌ Registration failed: ${err.message}`);
     }
   };
 
