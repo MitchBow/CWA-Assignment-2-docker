@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
 
     const newUser = await User.create({
         name, lineStatus,
-        stage: ''
     });
     return NextResponse.json(newUser, { status: 201, headers: corsHeaders });
   } catch (error) {
