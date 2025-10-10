@@ -13,14 +13,12 @@ const Login: React.FC<LoginProps> = ({ saveStages, loadStages }) => {
   const [message, setMessage] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // Use Docker Compose internal API URL
-  // Inside Docker, frontend can use the API container name
-  const API_URL = 'http://ec2-54-84-215-149.compute-1.amazonaws.com:4080/api/register';
-;
+  // ✅ Correct base API URL (no extra /api/register)
+  const API_URL = 'http://ec2-34-229-193-219.compute-1.amazonaws.com:4080/api';
 
   const handleLogin = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/login`, {
+      const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -41,7 +39,7 @@ const Login: React.FC<LoginProps> = ({ saveStages, loadStages }) => {
 
   const handleRegister = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/register`, {
+      const res = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -61,39 +59,94 @@ const Login: React.FC<LoginProps> = ({ saveStages, loadStages }) => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', width: '100%' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '20px',
+        width: '100%',
+      }}
+    >
       {!loggedIn && (
-        <div style={{ width: '90%', maxWidth: '600px', backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+        <div
+          style={{
+            width: '90%',
+            maxWidth: '600px',
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          }}
+        >
           <h2 style={{ marginBottom: '10px' }}>Login / Register</h2>
           <input
             type="text"
             placeholder="Username"
             value={username}
-            onChange={e => setUsername(e.target.value)}
-            style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{
+              width: '100%',
+              marginBottom: '10px',
+              padding: '8px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+            }}
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
-            style={{ width: '100%', marginBottom: '10px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{
+              width: '100%',
+              marginBottom: '10px',
+              padding: '8px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+            }}
           />
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
               onClick={handleLogin}
-              style={{ flex: 1, padding: '8px', borderRadius: '6px', backgroundColor: '#0070f3', color: 'white', border: 'none', cursor: 'pointer' }}
+              style={{
+                flex: 1,
+                padding: '8px',
+                borderRadius: '6px',
+                backgroundColor: '#0070f3',
+                color: 'white',
+                border: 'none',
+                cursor: 'pointer',
+              }}
             >
               Login
             </button>
             <button
               onClick={handleRegister}
-              style={{ flex: 1, padding: '8px', borderRadius: '6px', backgroundColor: 'green', color: 'white', border: 'none', cursor: 'pointer' }}
+              style={{
+                flex: 1,
+                padding: '8px',
+                borderRadius: '6px',
+                backgroundColor: 'green',
+                color: 'white',
+                border: 'none',
+                cursor: 'pointer',
+              }}
             >
               Register
             </button>
           </div>
-          {message && <div style={{ color: message.startsWith('✅') ? 'green' : 'red', fontWeight: 'bold', marginTop: '10px' }}>{message}</div>}
+          {message && (
+            <div
+              style={{
+                color: message.startsWith('✅') ? 'green' : 'red',
+                fontWeight: 'bold',
+                marginTop: '10px',
+              }}
+            >
+              {message}
+            </div>
+          )}
         </div>
       )}
 
