@@ -24,7 +24,7 @@ services:
       - NODE_ENV=development
     volumes:
       - ./api:/app
-      - sqlite_data:/app/sqlite
+      - ./api/app/sqlite:/app/sqlite
     networks:
       - app-network
     command: sh -c "npx sequelize-cli db:migrate && npm run dev"
