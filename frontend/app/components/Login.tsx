@@ -14,7 +14,7 @@ const Login: React.FC<LoginProps> = ({ saveStages, loadStages }) => {
   const [loggedIn, setLoggedIn] = useState(false);
 
   // ✅ Correct base API URL (no extra /api/register)
-  const API_URL = 'http://ec2-34-229-193-219.compute-1.amazonaws.com:4080/api';
+  const API_URL = 'http://ec2-13-220-91-34.compute-1.amazonaws.com:4080/api';
 
   const handleLogin = async () => {
     try {

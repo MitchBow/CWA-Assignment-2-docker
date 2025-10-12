@@ -5,7 +5,7 @@ import sqlite3 from 'sqlite3';
 export const sequelize = new Sequelize({
   dialect: 'sqlite',
   dialectModule: sqlite3,
-  storage: path.resolve('./sqlite/dev.sqlite'),
+  storage: path.resolve('./sqlite/dev.sqlite'), // make sure this path is writable
   logging: false,
 });
 
@@ -29,3 +29,13 @@ User.init(
     timestamps: false,
   }
 );
+
+// ✅ Sync database on import
+(async () => {
+  try {
+    await sequelize.sync({ alter: true }); // creates table if missing
+    console.log('✅ Database synced!');
+  } catch (err) {
+    console.error('❌ Failed to sync database:', err);
+  }
+})();
