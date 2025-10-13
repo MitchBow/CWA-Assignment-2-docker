@@ -7,8 +7,8 @@ import sqlite3 from 'sqlite3';
 // SQLite setup with explicitly defined dialectModule
 export const sequelize = new Sequelize({
   dialect: 'sqlite',
-  dialectModule: sqlite3, // Make sure to use the correct sqlite3 driver
-  storage: path.resolve('./sqlite/dev.sqlite'),
+  dialectModule: sqlite3,
+  storage: path.resolve('./sqlite/dev.sqlite'), // make sure this path is writable
   logging: false,
 });
 
@@ -55,3 +55,13 @@ User.init(
     timestamps: true,
   }
 );
+
+// ✅ Sync database on import
+(async () => {
+  try {
+    await sequelize.sync({ alter: true }); // creates table if missing
+    console.log('✅ Database synced!');
+  } catch (err) {
+    console.error('❌ Failed to sync database:', err);
+  }
+})();

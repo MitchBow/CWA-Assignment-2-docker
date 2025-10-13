@@ -5,7 +5,7 @@ import StageManager from '../components/StageManager';
 import Login from '../components/Login';
 import ManualTimer from '../components/ManualTimer';
 import CourtroomBackground from '../components/CourtroomBackground';
-import NotificationManager from '../components/NotificationManager'; // <-- import it
+import NotificationManager from '../components/NotificationManager'; 
 
 export default function CourtroomPage() {
   const [username, setUsername] = useState('');
@@ -18,16 +18,13 @@ export default function CourtroomPage() {
       isCourtroom={isCourtroom}
     >
       <div style={{ minHeight: '100vh', backgroundColor: 'transparent' }}>
-        {/* Header with padding */}
         <div style={{ paddingBottom: '50px' }}>
           <Header />
         </div>
 
-        {/* Login + Timer Row */}
         <div style={{
           width: '100%',
           padding: '0 20px',
-          boxSizing: 'border-box',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -37,21 +34,19 @@ export default function CourtroomPage() {
           marginBottom: '20px'
         }}>
           <div style={{ flex: '1 1 300px', display: 'flex', justifyContent: 'flex-start' }}>
-            <Login saveStages={() => console.log('save')} loadStages={() => console.log('load')} />
+            <Login username={username} setUsername={setUsername} />
           </div>
           <div style={{ flex: '1 1 300px', display: 'flex', justifyContent: 'flex-end' }}>
             <ManualTimer />
           </div>
         </div>
 
-        {/* StageManager full width */}
-        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '0 20px', boxSizing: 'border-box' }}>
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '0 20px' }}>
           <div style={{ width: '100%', maxWidth: '1200px' }}>
             <StageManager username={username} />
           </div>
         </div>
 
-        {/* NotificationManager */}
         <NotificationManager onCourtroom={setIsCourtroom} />
       </div>
     </CourtroomBackground>
