@@ -60,27 +60,22 @@ const Login: React.FC = () => {
     <div
       style={{
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
         justifyContent: 'center',
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #6B73FF 0%, #000DFF 100%)',
-        color: '#fff',
+        paddingTop: '50px',
         fontFamily: 'Arial, sans-serif',
-        padding: '20px',
       }}
     >
       <div
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backgroundColor: '#f9f9f9',
           padding: '40px',
           borderRadius: '12px',
-          boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
           width: '300px',
           textAlign: 'center',
         }}
       >
-        <h2 style={{ marginBottom: '20px' }}>Welcome</h2>
+        <h2 style={{ marginBottom: '20px', color: '#333' }}>Login / Register</h2>
         <input
           type="text"
           placeholder="Username"
@@ -89,7 +84,7 @@ const Login: React.FC = () => {
           style={{
             padding: '10px',
             borderRadius: '8px',
-            border: 'none',
+            border: '1px solid #ccc',
             marginBottom: '15px',
             width: '100%',
           }}
@@ -102,7 +97,7 @@ const Login: React.FC = () => {
           style={{
             padding: '10px',
             borderRadius: '8px',
-            border: 'none',
+            border: '1px solid #ccc',
             marginBottom: '20px',
             width: '100%',
           }}
@@ -119,7 +114,6 @@ const Login: React.FC = () => {
               color: '#fff',
               cursor: 'pointer',
               fontWeight: 'bold',
-              transition: 'background 0.3s',
             }}
             onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#007E33')}
             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#00C851')}
@@ -137,7 +131,6 @@ const Login: React.FC = () => {
               color: '#fff',
               cursor: 'pointer',
               fontWeight: 'bold',
-              transition: 'background 0.3s',
             }}
             onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#0099cc')}
             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#33b5e5')}
@@ -149,7 +142,7 @@ const Login: React.FC = () => {
           <div
             style={{
               marginTop: '20px',
-              color: message.startsWith('✅') ? '#00FF00' : '#FF4444',
+              color: message.startsWith('✅') ? '#00C851' : '#FF4444',
               fontWeight: 'bold',
             }}
           >
