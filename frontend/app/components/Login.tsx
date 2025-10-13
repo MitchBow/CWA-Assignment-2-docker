@@ -61,9 +61,10 @@ const Login: React.FC<LoginProps> = ({ username, setUsername }) => {
     <div
       style={{
         display: 'flex',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         padding: '50px 0',
+        paddingLeft: '130px', 
         fontFamily: 'Arial, sans-serif',
         flexDirection: 'column',
         gap: '20px',
