@@ -37,7 +37,7 @@ export default function CourtroomPage() {
           marginBottom: '20px'
         }}>
           <div style={{ flex: '1 1 300px', display: 'flex', justifyContent: 'flex-start' }}>
-            <Login saveStages={() => console.log('save')} loadStages={() => console.log('load')} />
+            <Login />
           </div>
           <div style={{ flex: '1 1 300px', display: 'flex', justifyContent: 'flex-end' }}>
             <ManualTimer />
