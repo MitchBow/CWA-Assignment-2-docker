@@ -7,7 +7,7 @@ interface LoginProps {
   setUsername: (name: string) => void;
 }
 
-const API_BASE = 'http://ec2-52-91-140-66.compute-1.amazonaws.com:4080/api';
+const API_BASE = 'http://ec2-52-90-166-209.compute-1.amazonaws.com:4080/api';
 
 const Login: React.FC<LoginProps> = ({ username, setUsername }) => {
   const [localUsername, setLocalUsername] = useState('');
